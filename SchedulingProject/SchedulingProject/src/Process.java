@@ -1,7 +1,7 @@
 
 public class Process {
 	
-	static int timeCreated;
+	int timeCreated;
 	int runningTime;
 	int cpuTime;
 	boolean cpuBound;
