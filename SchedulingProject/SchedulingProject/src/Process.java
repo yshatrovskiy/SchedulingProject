@@ -5,7 +5,7 @@ public class Process {
 	int runningTime;
 	int cpuTime;
 	boolean cpuBound;
-	int firstCPUBurst;
+	int cpuBurst;
 	
 	public Process(int timeCreated, int cpuTime, boolean cpuBound) {
 		super();
@@ -14,9 +14,9 @@ public class Process {
 		this.cpuBound = cpuBound;
 		
 		if(cpuBound){
-			this.firstCPUBurst = (4000/2) + (int) (Math.random() * 4000);
+			this.cpuBurst = (4000/2) + (int) (Math.random() * 4000);
 		}else{
-			this.firstCPUBurst = 20000/2 + (int) (Math.random() * 20000);
+			this.cpuBurst = 20000/2 + (int) (Math.random() * 20000);
 		}
 	}
 
@@ -44,12 +44,12 @@ public class Process {
 		this.cpuBound = cpuBound;
 	}
 
-	public int getFirstCPUBurst() {
-		return firstCPUBurst;
+	public int getcpuBurst() {
+		return cpuBurst;
 	}
 
-	public void setFirstCPUBurst(int firstCPUBurst) {
-		this.firstCPUBurst = firstCPUBurst;
+	public void setcpuBurst(int firstCPUBurst) {
+		this.cpuBurst = firstCPUBurst;
 	}
 	
 	public int getRunningTime() {

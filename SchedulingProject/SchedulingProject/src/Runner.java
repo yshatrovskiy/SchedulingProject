@@ -34,7 +34,7 @@ public class Runner {
 			while((line = brTest.readLine()) != null){
 				inputValues.add(Integer.parseInt(line.replaceAll("[\\D]", "")));
 			}
-
+			
 			totSimTime = inputValues.get(1) * 1000000;
 			q = inputValues.get(0) * 10000;
 			conSwitch = inputValues.get(2);
@@ -79,6 +79,21 @@ public class Runner {
 				if(!readyQueue.isEmpty() && !cpuQueue.isEmpty()){
 					Process currentProcess = readyQueue.removeFirst();
 					cpuQueue.add(currentProcess);
+					
+					if(currentProcess.getcpuBurst() <= q){
+						if(currentProcess.getCpuTime() <= currentProcess.getcpuBurst()){
+							clock += currentProcess.getCpuTime();
+							//Event Removed
+						}
+						else{
+							clock += currentProcess.getcpuBurst();
+							//Event Added to ready queue
+						}
+					}else{
+						clock += q;
+						currentProcess.setCpuTime(currentProcess.getCpuTime() - q);
+						//Event Added to ready queue
+					}
 				}
 			}
 		}
