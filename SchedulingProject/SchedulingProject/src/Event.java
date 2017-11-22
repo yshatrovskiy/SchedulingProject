@@ -1,5 +1,6 @@
+import java.util.Comparator;
 
-public class Event {
+public class Event implements Comparable<Event> {
 	
 	private int time;
 	private String type;
@@ -25,5 +26,14 @@ public class Event {
 	public void setType(String type) {
 		this.type = type;
 	}
+
+	@Override
+	public int compareTo(Event o) {
+		if(o.getTime() > this.getTime())
+			return -1;
+		else
+			return 1;
+	}
+
 
 }

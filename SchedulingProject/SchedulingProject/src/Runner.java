@@ -3,6 +3,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Random;
 
 
 public class Runner {
@@ -15,11 +17,7 @@ public class Runner {
 	static LinkedList<Process> cpuQueue = new LinkedList<Process>();
 	static LinkedList<Process> ioQueue = new LinkedList<Process>();
 	static LinkedList<Process> ioServQueue = new LinkedList<Process>();
-
-
-	//	PriorityQueue(11, Comparator<? super E> comparator);
-	//	
-	//    PriorityQueue<String> queue = new PriorityQueue<String>(10, comparator);
+	static PriorityQueue<Event> eventQueue = new PriorityQueue<Event>(20);
 
 	static int cpuProcessCount, ioprocessCount, q, 
 	totSimTime, conSwitch, avgProcLen, avgTimeBetweenProc, 
@@ -27,7 +25,7 @@ public class Runner {
 
 
 	public static void main(String args[]) throws FileNotFoundException{
-
+		
 
 		BufferedReader brTest;
 		try {
@@ -58,9 +56,22 @@ public class Runner {
 			e1.printStackTrace();
 
 		}
+		
+		//Priority Queue Test Input/Output
+		for(int i = 0; i < 10; i++){
+			eventQueue.add(new Event(generateRandomTime(100), "First " + i));
+			System.out.print(generateRandomTime(100) + " ,");
+		}
+		System.out.println("Done One");
+		for(int i = 0; i < 10; i++){
+			System.out.println(eventQueue.peek().getTime());
+			eventQueue.remove();
+		}
+		System.out.println("Done Two");
+		
 
-
-		while(clock < totSimTime){
+		//Reverse Symbol for clock to work
+		while(clock > totSimTime){
 			String type = "test";  //Deque type from priorityQueue
 
 			switch(type){
@@ -89,7 +100,19 @@ public class Runner {
 
 	}
 
+	//Random Number Generated Based on Input
 	public static int generateRandomTime(int averageMicroProvided){
 		return (averageMicroProvided/2) + (int) (Math.random() * averageMicroProvided);
+	}
+	
+	//Percent CPU/IO Generator
+	public static boolean generateIO(int percent){
+		Random rand = new Random();
+		int tester = rand.nextInt(101);
+		System.out.println("tester is " +tester);
+		if(tester <= percent)
+			return true;
+		else
+			return false;
 	}
 }
