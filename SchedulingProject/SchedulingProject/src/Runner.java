@@ -20,9 +20,8 @@ public class Runner {
 	static PriorityQueue<Event> eventQueue = new PriorityQueue<Event>(20);
 
 	static int cpuProcessCount, ioprocessCount, q, 
-	totSimTime, conSwitch, avgProcLen, avgTimeBetweenProc, 
+	totSimTime, conSwitch, avgProcessLength, avgTimeBetweenProc, 
 	perJobIo, avgInterruptTime;
-
 
 	public static void main(String args[]) throws FileNotFoundException{
 		
@@ -36,68 +35,55 @@ public class Runner {
 				inputValues.add(Integer.parseInt(line.replaceAll("[\\D]", "")));
 			}
 
-			totSimTime = inputValues.get(1);
-			q = inputValues.get(0) * 1000000;
+			totSimTime = inputValues.get(1) * 1000000;
+			q = inputValues.get(0) * 10000;
 			conSwitch = inputValues.get(2);
-			avgProcLen = inputValues.get(3);
+			avgProcessLength = inputValues.get(3);
 			avgTimeBetweenProc = inputValues.get(4);
 			perJobIo = inputValues.get(5);
 			avgInterruptTime = inputValues.get(6);		
-
-			//Average Tester
-			int temp = 0;
-			for(int i = 0; i<100;i++){
-				temp += generateRandomTime(avgInterruptTime);
-			}
-			System.out.println(temp/100);
 
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
 
 		}
-		
-		//Priority Queue Test Input/Output
-		for(int i = 0; i < 10; i++){
-			eventQueue.add(new Event(generateRandomTime(100), "First " + i));
-			System.out.print(generateRandomTime(100) + " ,");
-		}
-		System.out.println("Done One");
-		for(int i = 0; i < 10; i++){
-			System.out.println(eventQueue.peek().getTime());
-			eventQueue.remove();
-		}
-		System.out.println("Done Two");
-		
+
+		boolean firstOccurance = true;
+		eventQueue.add(new Event(generateRandomTime(avgTimeBetweenProc), "New"));
 
 		//Reverse Symbol for clock to work
-		while(clock > totSimTime){
-			String type = "test";  //Deque type from priorityQueue
-
-			switch(type){
-
+		while(clock < totSimTime){
+			
+			Event current = eventQueue.poll();	
+			switch(current.getType()){
+			
+			//Create a new process, add event to create new 
+			//process with time stamp of clock + average time between processes
 			case "New":
-				//Add new process to queue
-				break;
-
+				
+				if(firstOccurance){
+					readyQueue.add(new Process(0, generateRandomTime(avgProcessLength), generateIO(perJobIo)));
+					firstOccurance = false;
+				}else{
+					readyQueue.add(new Process(current.getTime(), generateRandomTime(avgProcessLength), generateIO(perJobIo)));
+				}
+				
+				//Add event to create new process and event for scheduler
+				eventQueue.add(new Event(clock + generateRandomTime(avgTimeBetweenProc), "New"));
+				eventQueue.add(new Event(clock, "Scheduler"));
+				
 			case "Scheduler":
+
+				clock += q;
+
 				//Pop eventQueue and put process on CPU
-				break;
-
+				if(!readyQueue.isEmpty() && !cpuQueue.isEmpty()){
+					Process currentProcess = readyQueue.removeFirst();
+					cpuQueue.add(currentProcess);
+				}
 			}
-
-			//createNewProcess()
-			//pushToCPU()
-			//--cpu queue
-			//endCpuBurst()
-			//pushToReadyQueue
-			//pushToIOServ
-			//pushToDone
-			//checkTime()
-			//--see if new process or to cpu
-
 		}
-
 	}
 
 	//Random Number Generated Based on Input
@@ -109,7 +95,6 @@ public class Runner {
 	public static boolean generateIO(int percent){
 		Random rand = new Random();
 		int tester = rand.nextInt(101);
-		System.out.println("tester is " +tester);
 		if(tester <= percent)
 			return true;
 		else
