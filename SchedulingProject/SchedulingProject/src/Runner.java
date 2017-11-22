@@ -75,8 +75,6 @@ public class Runner {
 				
 			case "Scheduler":
 
-				clock += q;
-
 				//Pop eventQueue and put process on CPU
 				if(!readyQueue.isEmpty() && !cpuQueue.isEmpty()){
 					Process currentProcess = readyQueue.removeFirst();
