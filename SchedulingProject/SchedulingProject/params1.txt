@@ -4,5 +4,5 @@
 50    contextSwitchTime
 1000 averageProcessLength
 1500 averageCreationTime
-100    IOBoundPct
+50    IOBoundPct
 20000   averageIOserviceTime
