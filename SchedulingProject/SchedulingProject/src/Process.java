@@ -1,26 +1,30 @@
+import java.util.Random;
 
 public class Process {
 	
-	int timeCreated;
-	int runningTime;
-	int cpuTime;
-	boolean cpuBound;
-	int cpuBurst;
-	
-	public Process(int timeCreated, int cpuTime, boolean cpuBound) {
-		super();
-		this.timeCreated = timeCreated;
-		this.cpuTime = cpuTime;
-		this.cpuBound = cpuBound;
-		
-		if(cpuBound){
-			this.cpuBurst = (4000/2) + (int) (Math.random() * 4000);
-		}else{
-			this.cpuBurst = 20000/2 + (int) (Math.random() * 20000);
-		}
+	long timeCreated;
+	long runningTime;
+	long cpuTime;
+	long pid;
+	public long getPid() {
+		return pid;
 	}
 
-	public int getTimeCreated() {
+	public void setPid(long pid) {
+		this.pid = pid;
+	}
+
+	boolean cpuBound;
+	
+	public Process(long pid, long timeCreated, long d, boolean cpuBound) {
+		super();
+		this.timeCreated = timeCreated;
+		this.cpuTime = d;
+		this.cpuBound = cpuBound;
+		this.pid = pid;
+	}
+
+	public long getTimeCreated() {
 		return timeCreated;
 	}
 
@@ -28,12 +32,12 @@ public class Process {
 		this.timeCreated = timeCreated;
 	}
 
-	public int getCpuTime() {
+	public long getCpuTime() {
 		return cpuTime;
 	}
 
-	public void setCpuTime(int cpuTime) {
-		this.cpuTime = cpuTime;
+	public void setCpuTime(long l) {
+		this.cpuTime = l;
 	}
 
 	public boolean isCpuBound() {
@@ -43,16 +47,8 @@ public class Process {
 	public void setCpuBound(boolean cpuBound) {
 		this.cpuBound = cpuBound;
 	}
-
-	public int getcpuBurst() {
-		return cpuBurst;
-	}
-
-	public void setcpuBurst(int firstCPUBurst) {
-		this.cpuBurst = firstCPUBurst;
-	}
 	
-	public int getRunningTime() {
+	public long getRunningTime() {
 		return runningTime;
 	}
 

@@ -2,16 +2,32 @@ import java.util.Comparator;
 
 public class Event implements Comparable<Event> {
 	
-	private int time;
+	private long time;
 	private String type;
+	private long burstTimeUsed;
 	
-	public Event(int time, String type) {
+	public long getBurstTimeUsed() {
+		return burstTimeUsed;
+	}
+
+	public void setBurstTimeUsed(long burstTimeUsed) {
+		this.burstTimeUsed = burstTimeUsed;
+	}
+
+	public Event(long timeAfterProcessing, String type) {
 		super();
-		this.time = time;
+		this.time = timeAfterProcessing;
+		this.type = type;
+	}
+	
+	public Event(long timeAfterProcessing, String type, long burstTime) {
+		super();
+		this.burstTimeUsed = burstTime;
+		this.time = timeAfterProcessing;
 		this.type = type;
 	}
 
-	public int getTime() {
+	public long getTime() {
 		return time;
 	}
 
@@ -25,6 +41,10 @@ public class Event implements Comparable<Event> {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public String toString(){
+		return this.getType() + " " + this.getTime();
 	}
 
 	@Override
