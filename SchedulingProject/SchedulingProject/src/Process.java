@@ -2,21 +2,21 @@ import java.util.Random;
 
 public class Process {
 	
-	long timeCreated;
-	long runningTime;
-	long cpuTime;
-	long pid;
-	public long getPid() {
+	double timeCreated;
+	double runningTime;
+	double cpuTime;
+	double pid;
+	public double getPid() {
 		return pid;
 	}
 
-	public void setPid(long pid) {
+	public void setPid(double pid) {
 		this.pid = pid;
 	}
 
 	boolean cpuBound;
 	
-	public Process(long pid, long timeCreated, long d, boolean cpuBound) {
+	public Process(double pid, double timeCreated, double d, boolean cpuBound) {
 		super();
 		this.timeCreated = timeCreated;
 		this.cpuTime = d;
@@ -24,7 +24,7 @@ public class Process {
 		this.pid = pid;
 	}
 
-	public long getTimeCreated() {
+	public double getTimeCreated() {
 		return timeCreated;
 	}
 
@@ -32,11 +32,11 @@ public class Process {
 		this.timeCreated = timeCreated;
 	}
 
-	public long getCpuTime() {
+	public double getCpuTime() {
 		return cpuTime;
 	}
 
-	public void setCpuTime(long l) {
+	public void setCpuTime(double l) {
 		this.cpuTime = l;
 	}
 
@@ -48,7 +48,7 @@ public class Process {
 		this.cpuBound = cpuBound;
 	}
 	
-	public long getRunningTime() {
+	public double getRunningTime() {
 		return runningTime;
 	}
 

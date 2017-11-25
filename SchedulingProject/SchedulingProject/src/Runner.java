@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Random;
@@ -10,7 +11,7 @@ import java.util.Random;
 public class Runner {
 
 
-	static long clock= 0;
+	static double clock= 0;
 
 	static LinkedList<Integer> inputValues = new LinkedList<Integer>();
 	static LinkedList<Process> readyQueue = new LinkedList<Process>();
@@ -19,11 +20,11 @@ public class Runner {
 	static LinkedList<Process> ioServQueue = new LinkedList<Process>();
 	static PriorityQueue<Event> eventQueue = new PriorityQueue<Event>(20);
 
-	static long cpuProcessCount, ioprocessCount, q, 
+	static double cpuProcessCount, ioprocessCount, q, 
 	conSwitch, avgProcessLength, avgTimeBetweenProc, 
 	perJobIo, avgInterruptTime;
 
-	static long totSimTime;
+	static double totSimTime;
 
 	public static void main(String args[]) throws FileNotFoundException{
 
@@ -39,26 +40,26 @@ public class Runner {
 
 			totSimTime = inputValues.get(0);
 
-			q = inputValues.get(1);
+			q = inputValues.get(1)/ 1000.0;
 
-			conSwitch = inputValues.get(2);
+			conSwitch = inputValues.get(2)/ 1000.0;
 
-			avgProcessLength = inputValues.get(3);
+			avgProcessLength = inputValues.get(3)/ 1000.0;
 
-			avgTimeBetweenProc = inputValues.get(4);
+			avgTimeBetweenProc = inputValues.get(4)/ 1000.0;
 
 			perJobIo = inputValues.get(5);
 
-			avgInterruptTime = inputValues.get(6);
+			avgInterruptTime = inputValues.get(6)/ 1000.0;
 
 
 			//			
-			System.out.println(totSimTime);
-			System.out.println(q);
+//			System.out.println(totSimTime);
+//			System.out.println(q);
 			//			System.out.println(conSwitch);
 			//			System.out.println(avgProcessLength);
-						System.out.println(avgTimeBetweenProc);
-						System.out.println(perJobIo);
+//						System.out.println(avgTimeBetweenProc);
+//						System.out.println(perJobIo);
 			//			System.out.println(avgInterruptTime);
 
 
@@ -70,12 +71,15 @@ public class Runner {
 		boolean firstOccurance = true;
 		eventQueue.add(new Event(0, "New"));
 		int pid = 0;
-		long currentBurst;
+		double currentBurst;
 		//Reverse Symbol for clock to work
 		while(clock < totSimTime){
 
+			DecimalFormat df = new DecimalFormat("##.000000");
+			df.format(clock);
 			
-			printEvents(eventQueue);
+			System.out.print("Clock " + df.format(clock) + " | Event Type : ");
+//			printEvents(eventQueue);
 			Event current = eventQueue.poll();	
 
 			//Set Time
@@ -87,7 +91,7 @@ public class Runner {
 			//process with time stamp of clock + average time between processes
 			case "New":
 
-				System.out.print("New Event");
+				System.out.print("New  | ");
 				pid++;
 				if(firstOccurance){
 					readyQueue.add(new Process(pid, 0, (long)generateRandomTime(avgProcessLength), generateIO(perJobIo)));
@@ -102,22 +106,23 @@ public class Runner {
 				break;
 
 			case "Scheduler":
-				System.out.println("Scheduler Event:");
+				System.out.print("Scheduler | ");
 
 				//Pop eventQueue and put process on CPU
 				//If not empty, event does nothing
 				if(!readyQueue.isEmpty() && cpuQueue.isEmpty()){
 					Process currentProcess = readyQueue.removeFirst();
 					cpuQueue.add(currentProcess);
-					System.out.println(" - " + " is CPU Bound: " +currentProcess.isCpuBound() + " | Time Remaining: " + currentProcess.getCpuTime() + " | ID: " +currentProcess.getPid());
+					System.out.print("is CPU Bound: " +currentProcess.isCpuBound() + " | Time Remaining: " + currentProcess.getCpuTime() + " | ID: " +currentProcess.getPid() + " ");
 
 
 					if(currentProcess.getCpuTime() < q){
 
 						//Call Done Event with new time
-						int futureTime = (int) (clock + currentProcess.getCpuTime() + generateRandomTime(conSwitch));
-						System.out.println(" -- CPU Time Less " + " Future Time: " + futureTime);
+						double futureTime = (double) (clock + currentProcess.getCpuTime() + generateRandomTime(conSwitch));
+						System.out.print("CPU Time Less " + " Future Time: " + futureTime);
 						eventQueue.add(new Event(futureTime, "Done"));
+						System.out.print(" | Calls " + "Done ");
 
 					}else{
 
@@ -125,21 +130,23 @@ public class Runner {
 							
 							//Call Quantum event with new time
 							int futureTime = (int) (clock + q + generateRandomTime(conSwitch));
-							System.out.println(" -- CPU Bound " + " Future Time: " + futureTime);
+							System.out.print("CPU Bound " + " Future Time: " + futureTime);
 							eventQueue.add(new Event(futureTime, "Quantum"));
+							System.out.print(" | Calls " + "Quantum ");
 
 						}else{
 							
 							//Call IO Event with new time
-							long burst = generateCPUBurst(currentProcess.isCpuBound());
+							double burst = generateCPUBurst(currentProcess.isCpuBound());
 							int futureTime = (int) (clock + burst + generateRandomTime(conSwitch));
-							System.out.println(" -- IO Bound " + " Future Time: " + futureTime + " with CPU Burst of " + burst);
+							System.out.print("IO Bound " + " Future Time: " + futureTime + " with CPU Burst of " + burst);
 							eventQueue.add(new Event(futureTime, "IO", burst));
+							System.out.print(" | Calls " + "IO ");
 
 						}
 					}
 				}else{
-					System.out.println("No Processes in Queue");
+					System.out.print("No Processes in Queue");
 				}
 				
 
@@ -147,61 +154,65 @@ public class Runner {
 				break;
 
 			case "IO":
-				System.out.println("IO Event");
+				System.out.print("IO | ");
 				Process ioProcess = cpuQueue.poll();
 				ioProcess.setCpuTime(ioProcess.getCpuTime() - current.getBurstTimeUsed());
 				ioQueue.add(ioProcess);
 				eventQueue.add(new Event(current.getTime(), "IO Serve"));
+				System.out.print(" | Calls " + "IO Serve ");
 				break;
 
 
 			case "IO Serve":
-				System.out.println("IO Serve Event");
+				System.out.print("IO Serve | ");
 				Process ioServeProcess = ioQueue.removeFirst();
-				long timeAfterProcessing = (generateRandomTime(avgInterruptTime) + current.getTime());
+				double timeAfterProcessing = (generateRandomTime(avgInterruptTime) + current.getTime());
 				System.out.println(timeAfterProcessing);
 				ioServQueue.add(ioServeProcess);
 				eventQueue.add(new Event(timeAfterProcessing, "Back Ready"));
+				System.out.print(" | Calls " + "Back Ready ");
 				break;
 
 			case "Back Ready":
-				System.out.println("Back Ready Event");
+				System.out.print("Back Ready | ");
 				Process readyProcess = ioServQueue.removeFirst();
 				readyQueue.add(readyProcess);
 				eventQueue.add(new Event(current.getTime(), "Scheduler"));
+				System.out.print(" | Calls " + "Scheduler ");
 				break;
 
 			case "Quantum":
-				System.out.println("Quantum Event");
+				System.out.print("Quantum | ");
 				Process qProcess = cpuQueue.poll();
 				System.out.println( "-Before :"+qProcess.getCpuTime() + " ");
 				qProcess.setCpuTime(qProcess.getCpuTime() - q);
 				System.out.println("-After :"+qProcess.getCpuTime() + "  ");
 				eventQueue.add(new Event(current.getTime(), "Scheduler"));
+				System.out.print(" | Calls " + "Scheduler ");
 				break;
 
 			case "Done":
-				System.out.println("Done Event");
+				System.out.print("Done | ");
 				Process doneProcess = cpuQueue.poll(); 
 				doneProcess.setCpuTime(0);
 				eventQueue.add(new Event(current.getTime(), "Scheduler"));
+				System.out.print(" | Calls " + "Scheduler ");
 				break;
 
 			}
 			System.out.println();
-			System.out.println("clock is " + clock + " Total Sim Time is : " + totSimTime);
 		}
 	}
 
 	//Random Number Generated Based on Input
-	public static long generateRandomTime(long avgTimeBetweenProc2){
-		return (long) ((avgTimeBetweenProc2/2) + (Math.random() * avgTimeBetweenProc2));
+	public static double generateRandomTime(double avgTimeBetweenProc2){
+		return (double) ((avgTimeBetweenProc2/2) + (Math.random() * avgTimeBetweenProc2));
 	}
 
 	//Percent CPU/IO Generator
-	public static boolean generateIO(long percent){
+	public static boolean generateIO(double percent){
 		Random rand = new Random();
-		long tester = rand.nextInt(101);
+		double tester = rand.nextInt(101);
 //		System.out.println();
 //		System.out.println("Percent Entered: " + percent + " Result Number: " + tester);
 		if(tester > percent)
@@ -221,11 +232,11 @@ public class Runner {
 		System.out.println();
 	}
 	
-	public static int generateCPUBurst(boolean cpuBound){
+	public static double generateCPUBurst(boolean cpuBound){
 		Random rand = new Random();
 		if(cpuBound)
-			return  rand.nextInt((10001) + 10000);
+			return  rand.nextInt((10001) + 10000 / 1000);
 		else
-			return  rand.nextInt((2001) + 2000);
+			return  rand.nextInt((2001) + 2000) / 1000;
 	}
 }
