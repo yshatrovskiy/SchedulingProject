@@ -54,12 +54,12 @@ public class Runner {
 
 
 			//			
-//			System.out.println(totSimTime);
-//			System.out.println(q);
+			//			System.out.println(totSimTime);
+			System.out.println(q);
 			//			System.out.println(conSwitch);
 			//			System.out.println(avgProcessLength);
-//						System.out.println(avgTimeBetweenProc);
-//						System.out.println(perJobIo);
+			//						System.out.println(avgTimeBetweenProc);
+			//						System.out.println(perJobIo);
 			//			System.out.println(avgInterruptTime);
 
 
@@ -71,15 +71,15 @@ public class Runner {
 		boolean firstOccurance = true;
 		eventQueue.add(new Event(0, "New"));
 		int pid = 0;
-		double currentBurst;
+
 		//Reverse Symbol for clock to work
 		while(clock < totSimTime){
 
 			DecimalFormat df = new DecimalFormat("##.000000");
 			df.format(clock);
-			
+
 			System.out.print("Clock " + df.format(clock) + " | Event Type : ");
-//			printEvents(eventQueue);
+			//			printEvents(eventQueue);
 			Event current = eventQueue.poll();	
 
 			//Set Time
@@ -116,6 +116,13 @@ public class Runner {
 					System.out.print("is CPU Bound: " +currentProcess.isCpuBound() + " | Time Remaining: " + currentProcess.getCpuTime() + " | ID: " +currentProcess.getPid() + " ");
 
 
+					//If CPU bound, check CPUtime against quantum
+					//Check cpuBurst first
+
+					double currentBurst = generateCPUBurst(currentProcess.isCpuBound());
+
+					System.out.println();
+					System.out.println("--------------CPU Time is : " +  currentProcess.getCpuTime() + " Q is " + q + " --------------");
 					if(currentProcess.getCpuTime() < q){
 
 						//Call Done Event with new time
@@ -126,21 +133,20 @@ public class Runner {
 
 					}else{
 
-						if(generateCPUBurst(currentProcess.isCpuBound()) > q){
-							
+						if(currentBurst > q){
+
 							//Call Quantum event with new time
 							int futureTime = (int) (clock + q + generateRandomTime(conSwitch));
-							System.out.print("CPU Bound " + " Future Time: " + futureTime);
+							System.out.print("Greater than Q " + " Future Time: " + futureTime);
 							eventQueue.add(new Event(futureTime, "Quantum"));
 							System.out.print(" | Calls " + "Quantum ");
 
 						}else{
-							
+
 							//Call IO Event with new time
-							double burst = generateCPUBurst(currentProcess.isCpuBound());
-							int futureTime = (int) (clock + burst + generateRandomTime(conSwitch));
-							System.out.print("IO Bound " + " Future Time: " + futureTime + " with CPU Burst of " + burst);
-							eventQueue.add(new Event(futureTime, "IO", burst));
+							int futureTime = (int) (clock + currentBurst + generateRandomTime(conSwitch));
+							System.out.print("Less than Q " + " Future Time: " + futureTime + " with CPU Burst of " + currentBurst);
+							eventQueue.add(new Event(futureTime, "IO", currentBurst));
 							System.out.print(" | Calls " + "IO ");
 
 						}
@@ -148,7 +154,6 @@ public class Runner {
 				}else{
 					System.out.print("No Processes in Queue");
 				}
-				
 
 
 				break;
@@ -213,8 +218,8 @@ public class Runner {
 	public static boolean generateIO(double percent){
 		Random rand = new Random();
 		double tester = rand.nextInt(101);
-//		System.out.println();
-//		System.out.println("Percent Entered: " + percent + " Result Number: " + tester);
+		//		System.out.println();
+		//		System.out.println("Percent Entered: " + percent + " Result Number: " + tester);
 		if(tester > percent)
 			return true;
 		else
@@ -231,7 +236,7 @@ public class Runner {
 		System.out.println("--Events--");
 		System.out.println();
 	}
-	
+
 	public static double generateCPUBurst(boolean cpuBound){
 		Random rand = new Random();
 		if(cpuBound)
