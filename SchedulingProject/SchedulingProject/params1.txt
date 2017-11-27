@@ -1,8 +1,8 @@
 # 50% CPU-bound, 1 sec per proc, 1.5 sec btwn new proc
-10 totalSimulationTime
-50000   quantum
-20    contextSwitchTime
-50 averageProcessLength
-100000 averageCreationTime
-0    IOBoundPct
-5000   averageIOserviceTime
+3 totalSimulationTime
+10000   quantum
+50    contextSwitchTime
+1000000 averageProcessLength
+1500000 averageCreationTime
+50  IOBoundPct
+20000   averageIOserviceTime

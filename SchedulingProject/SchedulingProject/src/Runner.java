@@ -59,12 +59,12 @@ public class Runner {
 			}
 
 			totSimTime = inputValues.get(0);
-			q = inputValues.get(1)/ 1000.0;
-			conSwitch = inputValues.get(2)/ 1000.0;
-			avgProcessLength = inputValues.get(3)/ 1000.0;
-			avgTimeBetweenProc = inputValues.get(4)/ 1000.0;
+			q = inputValues.get(1)/ 1000000.0;
+			conSwitch = inputValues.get(2)/ 1000000.0;
+			avgProcessLength = inputValues.get(3)/ 1000000.0;
+			avgTimeBetweenProc = inputValues.get(4)/ 1000000.0;
 			perJobIo = inputValues.get(5);
-			avgInterruptTime = inputValues.get(6)/ 1000.0;
+			avgInterruptTime = inputValues.get(6)/ 1000000.0;
 
 
 			System.out.println("Total Sim Time is " + totSimTime);
@@ -140,8 +140,8 @@ public class Runner {
 
 					double currentBurst = generateCPUBurst(currentProcess.isCpuBound());
 					double contextSwitch = generateRandomTime(conSwitch);
-					System.out.print("Current Burst is " + currentBurst + " | ");
-					contextSwitchTime += contextSwitch;
+					System.out.print("Current Burst is " + currentBurst + " | " + "Context Switch is " + contextSwitch +" | ");
+					contextSwitchTime = contextSwitchTime + contextSwitch;
 
 					if(currentBurst > currentProcess.getCpuTime()){
 
@@ -156,7 +156,7 @@ public class Runner {
 						if(currentBurst > q){
 
 							//Call Quantum
-							int futureTime = (int) (clock + q + contextSwitch);
+							double futureTime = (double) (clock + q + contextSwitch);
 							System.out.print("Greater than Q ");
 							eventQueue.add(new Event(futureTime, "Quantum"));
 							System.out.print(" | --> " + "Quantum at " + futureTime + " ");
@@ -165,7 +165,8 @@ public class Runner {
 
 							//Call IO
 							addInterCount(currentProcess);
-							int futureTime = (int) (clock + currentBurst + contextSwitch);
+
+							double futureTime = (double) (clock + currentBurst + contextSwitch);
 							System.out.print("Less than Q ");
 							eventQueue.add(new Event(futureTime, "IO", currentBurst));
 							System.out.print(" | --> " + "IO at " + futureTime + " ");
@@ -201,6 +202,9 @@ public class Runner {
 				System.out.print("IO Serve | ");
 				Process ioServeProcess = ioQueue.removeFirst();
 				double  ioServiceTime = generateRandomTime(avgInterruptTime);
+				ioServeProcess.setTimeInIO(ioServeProcess.getTimeInIO() + ioServiceTime);
+				System.out.print("Running IO Service Time with " + ioServiceTime + " | " 
+				+ "Total Time in IO " + ioServeProcess.getTimeInIO() + " | Process ID : " + ioServeProcess.getPid());
 				double timeAfterProcessing = (ioServiceTime + current.getTime());
 				updateIOServeTime(ioServeProcess, ioServiceTime);
 
@@ -220,13 +224,13 @@ public class Runner {
 			case "Quantum":
 				System.out.print("Quantum | ");
 				Process qProcess = cpuQueue.poll();
-				System.out.println( "-Before :"+qProcess.getCpuTime() + " ");
+//				System.out.println( "-Before :"+qProcess.getCpuTime() + " ");
 				qProcess.setCpuTime(qProcess.getCpuTime() - q);
 
 				//Count CPU Usage
 				upDateCPUuse(qProcess, q);
-
-				System.out.println("-After :"+qProcess.getCpuTime() + "  ");
+				readyQueue.add(qProcess);
+//				System.out.println("-After :"+qProcess.getCpuTime() + "  ");
 				eventQueue.add(new Event(current.getTime(), "Scheduler"));
 				System.out.print(" | --> " + "Scheduler ");
 				break;
@@ -248,7 +252,6 @@ public class Runner {
 		}
 		System.out.println();
 		System.out.println();
-
 		System.out.println("OVERALL");
 		System.out.println("Simulation Time: " + df.format(totSimTime));
 		System.out.println("Created " + (cpuProcessCount + ioProcessCount) + " processes");
@@ -260,36 +263,54 @@ public class Runner {
 
 		System.out.println("TOTAL number of proc. completed: " + (ioBoundCount + cpuBoundCount));
 		System.out.println("Ratio of I/O-bound completed: " );
-		System.out.println("Average CPU Time :" + df.format(((double) (cpuCPUTime + ioCPUTime)/(cpucpuUseCount + iocpuUseCount))));
+		System.out.println("Average CPU Time :" + df.format(((double) (cpuCPUTime + ioCPUTime)/(ioBoundCount + cpuBoundCount))));
 		System.out.println("Average ready waiting time: " );
-		System.out.println("Average turnaround time: " + df.format(((double)(cpuTurnAroundTime/cpuBoundCount))));
+		System.out.println("Average turnaround time: " + df.format(((double)(  (cpuTurnAroundTime + ioTurnAroundTime)/(cpuBoundCount + ioBoundCount) ))));
 		System.out.println();
 
 
 		System.out.println("Number of I/O-BOUND proc. completed: " + ioBoundCount);
-		System.out.println("Average CPU time: " + df.format(((double)ioCPUTime/iocpuUseCount)));
+		System.out.println("Average CPU time: " + df.format(((double)ioCPUTime/ioBoundCount)));
 		System.out.println("Average ready waiting time: ");
-		double count = (double)ioIOTime/ioIOCount;
-		if(count > 0)
-			System.out.println("Average I/O service time: " + df.format((count)));
-		else
-			System.out.println("Average I/O service time: " + 0);
+		double count = 0.0;
+		if(ioIOCount > 0)
+			count = (double)(ioIOTime/ioBoundCount);
+		System.out.println("Average I/O service time: " + df.format((count)));
+		
+		System.out.println("Total I/O service time: " + ioIOTime);
+		System.out.println("Total I/O service Count: " + ioIOCount);
+		System.out.println("Total I/O Interrupt Count: " + ioInterCount);
+		
+		
 		System.out.println("Average turnaround time: " + df.format(((double)(ioTurnAroundTime/ioBoundCount))));
-		System.out.println("Average I/O interrupts/proc.: " + ioInterCount/(cpuProcessCount + ioProcessCount));
+		System.out.println("Average I/O interrupts/proc.: " + (ioInterCount/ioBoundCount));
 		System.out.println();
 
 
 		System.out.println("Number of CPU-BOUND proc. completed: " + cpuBoundCount);
-		System.out.println("Average CPU time: " + df.format(((double)cpuCPUTime/cpucpuUseCount)));
+		System.out.println("Average CPU time: " + df.format(((double)cpuCPUTime/cpuBoundCount)));
 		System.out.println("Average ready waiting time: ");
-		count = (double)cpuIOTime/cpuIOCount;
-		if(count > 0)
-			System.out.println("Average I/O service time: " + df.format((count)));
-		else
-			System.out.println("Average I/O service time: " + 0);
+		count = 0.0;
+		if(cpuIOCount > 0)
+			count = (double)cpuIOTime/cpuBoundCount;
+		System.out.println("Average I/O service time: " + df.format((count)));
+		
+		
 		System.out.println("Average turnaround time: " + df.format(((double)(cpuTurnAroundTime/cpuBoundCount))));
-		System.out.println("Average I/O interrupts/proc.: " + cpuInterCount/(cpuProcessCount + ioProcessCount));
+		System.out.println("Average I/O interrupts/proc.: " + (cpuInterCount/cpuBoundCount));
 		System.out.println();
+		
+		
+		
+		
+		System.out.println("Total Sim Time is " + totSimTime);
+		System.out.println("Quantum is " + q);
+		System.out.println("Context Switch is " + conSwitch);
+		System.out.println("Average Process Time " + avgProcessLength);
+		System.out.println("Average Time Between Processes " + avgTimeBetweenProc);
+		System.out.println("IO Percentage " + perJobIo);
+		System.out.println("Average Interrupt Time " + avgInterruptTime);
+
 	}
 	
 	public static void addProcessCount(Process p){
@@ -317,10 +338,10 @@ public class Runner {
 
 	public static void updateIOServeTime(Process p, double timeUsed){
 		if(p.isCpuBound()){
-			cpuIOTime += timeUsed;
+			cpuIOTime =  cpuIOTime + timeUsed;
 			cpuIOCount++;
 		}else{
-			ioIOTime += timeUsed;
+			ioIOTime = ioIOTime + timeUsed;
 			ioIOCount++;
 		}
 
@@ -328,7 +349,19 @@ public class Runner {
 
 	//Random Number Generated Based on Input
 	public static double generateRandomTime(double avgTimeBetweenProc2){
-		return (double) ((avgTimeBetweenProc2/2) + (Math.random() * avgTimeBetweenProc2));
+		
+	    // take the natural log of (a random FLOAT between 0 and 1)
+	    // then multiply by the negative of the expected ("average") value passed in
+	    double nice = -avgTimeBetweenProc2 * Math.log ( Math.random() );
+	    // in my code, all numbers are in millionths of a second, but I round all random numbers
+	    // to the nearest 100 microseconds (chop off the last two digits)
+	    // here's a simple way to do that with a float or double:
+//	    nice *= 10000;
+//	    nice = (int) nice;
+//	    nice /= 10000;
+	    return ( nice );
+		
+//		return (double) ((avgTimeBetweenProc2/2) + (Math.random() * avgTimeBetweenProc2));
 	}
 
 	//Percent CPU/IO Generator
@@ -353,7 +386,8 @@ public class Runner {
 	public static void upDateCPUuse(Process process, double timeUsed){
 		if(process.isCpuBound()){
 			cpucpuUseCount++;
-			cpuCPUTime+= timeUsed;
+			cpuCPUTime = cpuCPUTime + timeUsed;
+			System.out.println("----------------------USED CPU TOTAL : " + cpuCPUTime);
 		}else{
 			iocpuUseCount++;
 			ioCPUTime += timeUsed;
@@ -362,10 +396,14 @@ public class Runner {
 
 	public static double generateCPUBurst(boolean cpuBound){
 		Random rand = new Random();
-		if(cpuBound)
-			return  ((double)rand.nextInt((1001)) + 1000) / 1000;
+		if(cpuBound){
+			double time = ((double)rand.nextInt((10001)) + 10000) / 1000000;
+//			  ((double)rand.nextInt((10001)) + 10000) / 1000000;
+//			System.out.println("----------------------CPU TIME GENERATED : " + time);
+			return time;
+		}
 		else
-			return  ((double)rand.nextInt((201)) + 200) / 1000;
+			return  ((double)rand.nextInt((2001)) + 2000) / 1000000;
 	}
 
 	public static void addCompleted(Process p){

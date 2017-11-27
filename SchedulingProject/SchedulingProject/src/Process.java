@@ -6,6 +6,16 @@ public class Process {
 	double runningTime;
 	double cpuTime;
 	double pid;
+	double timeInIO;
+	
+	public double getTimeInIO() {
+		return timeInIO;
+	}
+
+	public void setTimeInIO(double timeInIO) {
+		this.timeInIO = timeInIO;
+	}
+
 	public double getPid() {
 		return pid;
 	}
