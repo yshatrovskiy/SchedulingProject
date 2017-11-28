@@ -1,5 +1,8 @@
 import java.util.Comparator;
 
+//Ivan Tang, Yevgeniy Shatrovskiy, Brandon Deluca 
+//Event class that is needed to hold all of the information for each event
+//BurstTimeUsed is used to keep track of how much burst remains before going IO
 public class Event implements Comparable<Event> {
 	
 	private double time;

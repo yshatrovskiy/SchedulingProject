@@ -9,28 +9,28 @@ Average Interrupt Time 0.02
 
 OVERALL
 Simulation Time: 						100.000
-Created 62.0 processes
-Average CPU Time: 						1.024
-CPU utilization: 						63.48%
-Total time in context switches: 		0.784
+Created 68.0 processes
+Average CPU Time: 						0.960
+CPU utilization: 						65.29%
+Total time in context switches: 		0.738
 
-TOTAL number of proc. completed: 		60
-Ratio of I/O-bound completed: 			56.7%
-Average CPU Time :						1.058 Seconds
-Average ready waiting time: 			1.115 Seconds
-Average turnaround time: 				6.803 Seconds
+TOTAL number of proc. completed: 		61
+Ratio of I/O-bound completed: 			49.2%
+Average CPU Time :						1.070 Seconds
+Average ready waiting time: 			1.134 Seconds
+Average turnaround time: 				5.916 Seconds
 
-Number of I/O-BOUND proc. completed: 	34
-Average CPU time: 						1.089 Seconds
-Average ready waiting time: 			2.056 Seconds
-Average I/O service time: 				7.225 Seconds
-Average turnaround time: 				9.908 Seconds
-Average I/O interrupts/proc.: 			363.26
+Number of I/O-BOUND proc. completed: 	30
+Average CPU time: 						0.988 Seconds
+Average ready waiting time: 			1.468 Seconds
+Average I/O service time: 				6.483 Seconds
+Average turnaround time: 				8.543 Seconds
+Average I/O interrupts/proc.: 			328.13
 
-Number of CPU-BOUND proc. completed: 	26
-Average CPU time: 						1.018 Seconds
-Average ready waiting time: 			0.602 Seconds
-Average I/O service time: 				1.351 Seconds
-Average turnaround time: 				2.743 Seconds
-Average I/O interrupts/proc.: 			67.50
+Number of CPU-BOUND proc. completed: 	31
+Average CPU time: 						1.150 Seconds
+Average ready waiting time: 			1.020 Seconds
+Average I/O service time: 				1.502 Seconds
+Average turnaround time: 				3.375 Seconds
+Average I/O interrupts/proc.: 			76.23
 

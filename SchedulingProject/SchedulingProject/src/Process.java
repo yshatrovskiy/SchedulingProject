@@ -1,5 +1,7 @@
 import java.util.Random;
 
+//Brandon Deluca, Ivan Tang, Yevgeniy Shatrovskiy
+//Process class that holds all of the information for each process.
 public class Process {
 	
 	double timeCreated;
