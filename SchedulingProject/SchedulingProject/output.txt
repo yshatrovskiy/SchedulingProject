@@ -1,0 +1,36 @@
+Total Sim Time is 100.0
+Quantum is 0.01
+Context Switch is 5.0E-5
+Average Process Time 1.0
+Average Time Between Processes 1.5
+IO Percentage 50.0
+Average Interrupt Time 0.02
+
+
+OVERALL
+Simulation Time: 						100.000
+Created 62.0 processes
+Average CPU Time: 						1.024
+CPU utilization: 						63.48%
+Total time in context switches: 		0.784
+
+TOTAL number of proc. completed: 		60
+Ratio of I/O-bound completed: 			56.7%
+Average CPU Time :						1.058 Seconds
+Average ready waiting time: 			1.115 Seconds
+Average turnaround time: 				6.803 Seconds
+
+Number of I/O-BOUND proc. completed: 	34
+Average CPU time: 						1.089 Seconds
+Average ready waiting time: 			2.056 Seconds
+Average I/O service time: 				7.225 Seconds
+Average turnaround time: 				9.908 Seconds
+Average I/O interrupts/proc.: 			363.26
+
+Number of CPU-BOUND proc. completed: 	26
+Average CPU time: 						1.018 Seconds
+Average ready waiting time: 			0.602 Seconds
+Average I/O service time: 				1.351 Seconds
+Average turnaround time: 				2.743 Seconds
+Average I/O interrupts/proc.: 			67.50
+
