@@ -7,7 +7,25 @@ public class Process {
 	double cpuTime;
 	double pid;
 	double timeInIO;
+	double firstBurst;
+	double timeEnteredWaiting;
 	
+	public double getTimeEnteredWaiting() {
+		return timeEnteredWaiting;
+	}
+
+	public void setTimeEnteredWaiting(double timeEnteredWaiting) {
+		this.timeEnteredWaiting = timeEnteredWaiting;
+	}
+
+	public double getFirstBurst() {
+		return firstBurst;
+	}
+
+	public void setFirstBurst(double firstBurst) {
+		this.firstBurst = firstBurst;
+	}
+
 	public double getTimeInIO() {
 		return timeInIO;
 	}
